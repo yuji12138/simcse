@@ -269,7 +269,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     seed_everything(args.seed)
-    args.device = torch.device("cuda:2" if torch.cuda.is_available() and args.device == 'gpu' else "cpu")
+    args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'gpu' else "cpu")
     args.output_path = join(args.output_path, args.train_mode, 'bsz-{}-lr-{}-dropout-{}'.format(args.batch_size_train, args.lr, args.dropout))
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
