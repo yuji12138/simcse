@@ -4,7 +4,7 @@ python train.py \
     --lr 3e-5 \
     --dropout 0.1 \
     --epochs 1 \
-    --batch_size_train 64 \
+    --batch_size_train 16 \
     --batch_size_eval 256 \
     --num_workers 0 \
     --eval_step 100 \
@@ -19,4 +19,4 @@ python train.py \
     --overwrite_cache \
     --do_train \
     --do_predict \
-    --local_rank 1
+    --nproc_per_node=4
