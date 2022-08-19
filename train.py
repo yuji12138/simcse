@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import argparse
 from tqdm import tqdm
 # from loguru import logger
