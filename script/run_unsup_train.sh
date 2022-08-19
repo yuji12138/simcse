@@ -1,5 +1,5 @@
 python train.py \
-    --device gpu \
+    --device cuda \
     --output_path output \
     --lr 3e-5 \
     --dropout 0.1 \
