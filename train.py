@@ -230,15 +230,12 @@ def main(args):
         elif args.train_mode == 'unsupervise':
             train_data = load_train_data_unsupervised(tokenizer, args)
         train_dataset = TrainDataset(train_data, tokenizer, max_len=args.max_len)
-        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        
 
 
         train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size_train, shuffle=True,
                                       num_workers=args.num_workers,
                                       sampler=DistributedSampler(train_dataset))
-        for epoch in range(num_epochs):
-    
-          train_dataloader.sampler.set_epoch(epoch)
 
         dev_data = load_eval_data(tokenizer, args, 'dev')
         dev_dataset = TestDataset(dev_data, tokenizer, max_len=args.max_len)
