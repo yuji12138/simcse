@@ -233,23 +233,23 @@ def main(args):
         
 
 
-        train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size_train, 
+        train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size_train,
                                       num_workers=args.num_workers,
                                       sampler=DistributedSampler(train_dataset))
 
         dev_data = load_eval_data(tokenizer, args, 'dev')
         dev_dataset = TestDataset(dev_data, tokenizer, max_len=args.max_len)
         dev_dataloader = DataLoader(dev_dataset, batch_size=args.batch_size_eval, 
-                                    num_workers=args.num_workers)
+                                    num_workers=args.num_workers,
+                                   sampler=DistributedSampler(dev_dataset))
         optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
         train(model, train_dataloader, dev_dataloader, optimizer, args)
 
     if args.do_predict:
         test_data = load_eval_data(tokenizer, args, 'test')
         test_dataset = TestDataset(test_data, tokenizer, max_len=args.max_len)
+
         test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size_eval, 
-                                     num_workers=args.num_workers)
-        test_dataloader = DataLoader(train_dataset, batch_size=args.batch_size_train, 
                                       num_workers=args.num_workers,
                                       sampler=DistributedSampler(test_dataset))
         model.load_state_dict(torch.load(join(args.output_path, 'simcse.pt')))
