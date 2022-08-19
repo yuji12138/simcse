@@ -248,7 +248,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--device", type=str, default='gpu', choices=['gpu', 'cpu'], help="gpu or cpu")
+    parser.add_argument("--device", type=str, default='gpu', choices=['cuda', 'cpu'], help="gpu or cpu")
     parser.add_argument("--output_path", type=str, default='output')
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--dropout", type=float, default=0.1)
