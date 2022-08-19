@@ -213,6 +213,9 @@ def main(args):
         'pooler should in ["cls", "pooler", "last-avg", "first-last-avg"]'
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
         args.device)
+    model = nn.DataParallel(model)
+    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3" #使用3个GPU
+
     if args.do_train:
         # 加载数据集
         assert args.train_mode in ['supervise', 'unsupervise'], \
@@ -266,12 +269,10 @@ if __name__ == '__main__':
     parser.add_argument("--overwrite_cache", action='store_true', default=False, help="overwrite cache")
     parser.add_argument("--do_train", action='store_true', default=True)
     parser.add_argument("--do_predict", action='store_true', default=True)
-    parser.add_argument("--local_rank", type=int)
     
     args = parser.parse_args()
     seed_everything(args.seed)
-    torch.cuda.set_device(args.local_rank)
-    # args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'cuda' else "cpu")
+    args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'cuda' else "cpu")
     args.output_path = join(args.output_path, args.train_mode, 'bsz-{}-lr-{}-dropout-{}'.format(args.batch_size_train, args.lr, args.dropout))
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
