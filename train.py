@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 import argparse
 from tqdm import tqdm
 # from loguru import logger
@@ -10,13 +10,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
+from torch.nn import DataParallel
 
 from dataset import TrainDataset, TestDataset
 from model import SimcseModel, simcse_unsup_loss, simcse_sup_loss
 from transformers import BertModel, BertConfig, BertTokenizer
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
 from os.path import join
 from torch.utils.tensorboard import SummaryWriter
 import random
@@ -24,6 +24,7 @@ import pickle
 import pandas as pd
 import time
 
+torch.distributed.init_process_group(backend="nccl")
 
 def seed_everything(seed=42):
     '''
@@ -215,8 +216,8 @@ def main(args):
     assert args.pooler in ['cls', "pooler", "last-avg", "first-last-avg"], \
         'pooler should in ["cls", "pooler", "last-avg", "first-last-avg"]'
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
-        args.device)
-    model = nn.DataParallel(model)
+        args.device)    
+    model = nn.DataParallel(model, device_ids=devices).to(device)
     if args.do_train:
         # 加载数据集
         assert args.train_mode in ['supervise', 'unsupervise'], \
@@ -234,6 +235,7 @@ def main(args):
                                     num_workers=args.num_workers)
         optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
         train(model, train_dataloader, dev_dataloader, optimizer, args)
+        
 
     if args.do_predict:
         test_data = load_eval_data(tokenizer, args, 'test')
