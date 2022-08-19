@@ -8,9 +8,9 @@ from scipy.stats import spearmanr
 
 import torch
 import torch.nn as nn
+from torch.nn import DataParallel
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
-from torch.nn import DataParallel
 
 from dataset import TrainDataset, TestDataset
 from model import SimcseModel, simcse_unsup_loss, simcse_sup_loss
@@ -217,7 +217,12 @@ def main(args):
         'pooler should in ["cls", "pooler", "last-avg", "first-last-avg"]'
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
         args.device)    
-    model = nn.DataParallel(model, device_ids=devices).to(device)
+    
+       
+    device_ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] 
+    model = torch.nn.DataParallel(model, device_ids=device_ids) # 指定要用到的设备
+    model = model.cuda(device=device_ids[0])
+
     if args.do_train:
         # 加载数据集
         assert args.train_mode in ['supervise', 'unsupervise'], \
@@ -275,7 +280,11 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     seed_everything(args.seed)
-    args.device = torch.device("cuda" if torch.cuda.is_available() and args.device == 'cuda' else "cpu")
+    
+
+    
+
+#     args.device = torch.device("cuda" if torch.cuda.is_available() and args.device == 'cuda' else "cpu")
     args.output_path = join(args.output_path, args.train_mode, 'bsz-{}-lr-{}-dropout-{}'.format(args.batch_size_train, args.lr, args.dropout))
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
