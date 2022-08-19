@@ -244,7 +244,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--device", type=str, default='gpu', choices=['gpu', 'cpu'], help="gpu or cpu")
+    parser.add_argument("--device", type=str, default='gpu', choices=['cuda', 'cpu'], help="cuda or cpu")
     parser.add_argument("--output_path", type=str, default='output')
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--dropout", type=float, default=0.1)
@@ -271,7 +271,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     seed_everything(args.seed)
     torch.cuda.set_device(args.local_rank)
-    # args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'gpu' else "cpu")
+    # args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'cuda' else "cpu")
     args.output_path = join(args.output_path, args.train_mode, 'bsz-{}-lr-{}-dropout-{}'.format(args.batch_size_train, args.lr, args.dropout))
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
