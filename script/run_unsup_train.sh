@@ -19,4 +19,4 @@ python train.py \
     --overwrite_cache \
     --do_train \
     --do_predict \
-    --local_rank 2
+    --local_rank 4
