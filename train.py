@@ -15,9 +15,7 @@ from model import SimcseModel, simcse_unsup_loss, simcse_sup_loss
 from transformers import BertModel, BertConfig, BertTokenizer
 
 import os
-
-os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3" #使用4个GPU
-
+os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
 from os.path import join
 from torch.utils.tensorboard import SummaryWriter
 import random
