@@ -19,4 +19,4 @@ python train.py \
     --overwrite_cache \
     --do_train \
     --do_predict \
-    --nproc_per_node 4
+    
