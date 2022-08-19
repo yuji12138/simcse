@@ -214,7 +214,7 @@ def main(args):
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
         args.device)
     model = nn.DataParallel(model)
-    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3" #使用3个GPU
+    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3" #使用4个GPU
 
     if args.do_train:
         # 加载数据集
