@@ -18,4 +18,5 @@ python train.py \
     --train_mode unsupervise \
     --overwrite_cache \
     --do_train \
-    --do_predict
+    --do_predict \
+    --local_rank 2
