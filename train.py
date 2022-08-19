@@ -13,7 +13,11 @@ from torch.utils.data import Dataset, DataLoader
 from dataset import TrainDataset, TestDataset
 from model import SimcseModel, simcse_unsup_loss, simcse_sup_loss
 from transformers import BertModel, BertConfig, BertTokenizer
+
 import os
+
+os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3" #使用4个GPU
+
 from os.path import join
 from torch.utils.tensorboard import SummaryWriter
 import random
@@ -214,8 +218,6 @@ def main(args):
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
         args.device)
     model = nn.DataParallel(model)
-    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3" #使用4个GPU
-
     if args.do_train:
         # 加载数据集
         assert args.train_mode in ['supervise', 'unsupervise'], \
