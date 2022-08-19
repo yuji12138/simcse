@@ -214,7 +214,7 @@ def main(args):
         'pooler should in ["cls", "pooler", "last-avg", "first-last-avg"]'
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
         args.device)
-    device_ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] # 10张显卡
+    device_ids = [0, 1, 2, 3] # 10张显卡
     model = torch.nn.DataParallel(model, device_ids=device_ids) # 指定要用到的设备
     model = model.cuda(device=device_ids[0]) 
     if args.do_train:
