@@ -4,8 +4,8 @@ CUDA_VISIBLE_DEVICES="0,1" python -m torch.distributed.launch  --nproc_per_node=
     --lr 3e-5 \
     --dropout 0.1 \
     --epochs 2 \
-    --batch_size_train 16 \
-    --batch_size_eval 64 \
+    --batch_size_train 32 \
+    --batch_size_eval 128 \
     --num_workers 0 \
     --eval_step 100 \
     --max_len 64 \
