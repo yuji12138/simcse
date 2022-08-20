@@ -1,5 +1,5 @@
 CUDA_VISIBLE_DEVICES="0,1" python -m torch.distributed.launch  --nproc_per_node=2  train.py \
-    --device gpu \
+    --device cuda \
     --output_path output \
     --lr 3e-5 \
     --dropout 0.1 \
