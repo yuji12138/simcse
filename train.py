@@ -46,7 +46,7 @@ def train(model, train_loader, dev_loader, optimizer, args):
     model.train()
     device = args.device
     best = 0
-    alpha = 1.0
+    alpha = 0.5
     criterion = nn.CrossEntropyLoss()
     for epoch in range(args.epochs):
         for batch_idx, data in enumerate(tqdm(train_loader)):
