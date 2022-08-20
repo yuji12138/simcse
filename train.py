@@ -216,7 +216,7 @@ def main(args):
         'pooler should in ["cls", "pooler", "last-avg", "first-last-avg"]'
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
         args.device)
-      device = torch.device("cuda", local_rank)
+    device = torch.device("cuda", local_rank)
     model = nn.Linear(10, 10).to(device)
     model = DDP(model, device_ids=[local_rank], output_device=local_rank)
     if args.do_train:
