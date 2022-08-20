@@ -273,10 +273,13 @@ if __name__ == '__main__':
     parser.add_argument("--overwrite_cache", action='store_true', default=False, help="overwrite cache")
     parser.add_argument("--do_train", action='store_true', default=True)
     parser.add_argument("--do_predict", action='store_true', default=True)
-
+    parser.add_argument("--local_rank", default=-1, type=int)
+    
     args = parser.parse_args()
     seed_everything(args.seed)
-    args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'gpu' else "cpu")
+    local_rank = args.local_rank
+    torch.cuda.set_device(local_rank)
+    # args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'gpu' else "cpu")
     args.output_path = join(args.output_path, args.train_mode, 'bsz-{}-lr-{}-dropout-{}'.format(args.batch_size_train, args.lr, args.dropout))
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
