@@ -279,6 +279,7 @@ if __name__ == '__main__':
     seed_everything(args.seed)
     local_rank = args.local_rank
     torch.cuda.set_device(local_rank)
+    dist.init_process_group(backend='nccl')
     # args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'gpu' else "cpu")
     args.output_path = join(args.output_path, args.train_mode, 'bsz-{}-lr-{}-dropout-{}'.format(args.batch_size_train, args.lr, args.dropout))
     if not os.path.exists(args.output_path):
