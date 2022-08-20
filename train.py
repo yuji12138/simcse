@@ -228,12 +228,14 @@ def main(args):
         elif args.train_mode == 'unsupervise':
             train_data = load_train_data_unsupervised(tokenizer, args)
         train_dataset = TrainDataset(train_data, tokenizer, max_len=args.max_len)
+        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
         train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size_train,drop_last=True,
                                       num_workers=args.num_workers,
-                                     sampler=DistributedSampler(train_dataset))
+                                     sampler=train_sampler)
         dev_data = load_eval_data(tokenizer, args, 'dev')
         dev_dataset = TestDataset(dev_data, tokenizer, max_len=args.max_len)
-        dev_dataloader = DataLoader(dev_dataset, batch_size=args.batch_size_eval, sampler=DistributedSampler(dev_dataset),drop_last=True,
+        dev_sampler = torch.utils.data.distributed.DistributedSampler(dev_dataset)
+        dev_dataloader = DataLoader(dev_dataset, batch_size=args.batch_size_eval, sampler=dev_sampler,drop_last=True,
                                     num_workers=args.num_workers)
         optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
         train(model, train_dataloader, dev_dataloader, optimizer, args)
@@ -241,7 +243,8 @@ def main(args):
     if args.do_predict:
         test_data = load_eval_data(tokenizer, args, 'test')
         test_dataset = TestDataset(test_data, tokenizer, max_len=args.max_len)
-        test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size_eval, sampler=DistributedSampler(test_dataset),drop_last=True,
+        test_sampler = torch.utils.data.distributed.DistributedSampler(test_dataset)
+        test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size_eval, sampler=test_sampler,drop_last=True,
                                      num_workers=args.num_workers)
         model.load_state_dict(torch.load(join(args.output_path, 'simcse.pt')))
         model.eval()
