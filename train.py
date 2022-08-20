@@ -242,7 +242,7 @@ def main(args):
         test_data = load_eval_data(tokenizer, args, 'test')
         test_dataset = TestDataset(test_data, tokenizer, max_len=args.max_len)
         test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size_eval, sampler=DistributedSampler(test_dataset),drop_last=True,
-                                     num_workers=args.num_workers,d)
+                                     num_workers=args.num_workers)
         model.load_state_dict(torch.load(join(args.output_path, 'simcse.pt')))
         model.eval()
         corrcoef = evaluate(model, test_dataloader, args.device)
