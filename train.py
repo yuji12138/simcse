@@ -8,6 +8,8 @@ from scipy.stats import spearmanr
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import Dataset, DataLoader
 
 from dataset import TrainDataset, TestDataset
@@ -126,7 +128,7 @@ def load_train_data_unsupervised(tokenizer, args):
     with open(args.train_file, 'r', encoding='utf8') as f:
         lines = f.readlines()
         # print(lines)
-        lines = lines[:100]
+        lines = lines[:6400]
         print("len of train data:{}".format(len(lines)))
         idx = 0
         for line in tqdm(lines):
@@ -214,6 +216,9 @@ def main(args):
         'pooler should in ["cls", "pooler", "last-avg", "first-last-avg"]'
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
         args.device)
+      device = torch.device("cuda", local_rank)
+    model = nn.Linear(10, 10).to(device)
+    model = DDP(model, device_ids=[local_rank], output_device=local_rank)
     if args.do_train:
         # 加载数据集
         assert args.train_mode in ['supervise', 'unsupervise'], \
@@ -223,11 +228,12 @@ def main(args):
         elif args.train_mode == 'unsupervise':
             train_data = load_train_data_unsupervised(tokenizer, args)
         train_dataset = TrainDataset(train_data, tokenizer, max_len=args.max_len)
-        train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size_train, shuffle=True,
-                                      num_workers=args.num_workers)
+        train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size_train,drop_last=True,
+                                      num_workers=args.num_workers,
+                                     sampler=DistributedSampler(train_dataset))
         dev_data = load_eval_data(tokenizer, args, 'dev')
         dev_dataset = TestDataset(dev_data, tokenizer, max_len=args.max_len)
-        dev_dataloader = DataLoader(dev_dataset, batch_size=args.batch_size_eval, shuffle=True,
+        dev_dataloader = DataLoader(dev_dataset, batch_size=args.batch_size_eval, sampler=DistributedSampler(dev_dataset),drop_last=True,
                                     num_workers=args.num_workers)
         optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
         train(model, train_dataloader, dev_dataloader, optimizer, args)
@@ -235,8 +241,8 @@ def main(args):
     if args.do_predict:
         test_data = load_eval_data(tokenizer, args, 'test')
         test_dataset = TestDataset(test_data, tokenizer, max_len=args.max_len)
-        test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size_eval, shuffle=True,
-                                     num_workers=args.num_workers)
+        test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size_eval, sampler=DistributedSampler(test_dataset),drop_last=True,
+                                     num_workers=args.num_workers,d)
         model.load_state_dict(torch.load(join(args.output_path, 'simcse.pt')))
         model.eval()
         corrcoef = evaluate(model, test_dataloader, args.device)
