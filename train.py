@@ -61,12 +61,12 @@ def train(model, train_loader, dev_loader, optimizer, args):
             token_type_ids = data['token_type_ids'].view(-1, sql_len).to(device)
             idx = data['idx'].view(2*args.batch_size_train).to(device)
             out = model(input_ids, attention_mask, token_type_ids)
-            cls_pred = model(input_ids, attention_mask, token_type_ids)
+            # cls_pred = model(input_ids, attention_mask, token_type_ids)
             if args.train_mode == 'unsupervise':
                 loss = simcse_unsup_loss(out, device)
                 ## classifiy loss
 
-                loss_cls = criterion(cls_pred,idx)
+                loss_cls = criterion(out,idx)
             else:
                 loss = simcse_sup_loss(out, device)
 
