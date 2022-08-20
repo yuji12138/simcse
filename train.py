@@ -250,6 +250,12 @@ def main(args):
         model.eval()
         corrcoef = evaluate(model, test_dataloader, args.device)
         print('testset corrcoef:{}'.format(corrcoef))
+        
+    if args.local_rank == 0:
+        # All processes should see same parameters as they all start from same
+        # random parameters and gradients are synchronized in backward passes.
+        # Therefore, saving it in one process is sufficient.
+        torch.save(ddp_model.state_dict(), CHECKPOINT_PATH)
 
 
 if __name__ == '__main__':
@@ -284,6 +290,8 @@ if __name__ == '__main__':
     torch.cuda.set_device(local_rank)
     dist.init_process_group(backend='nccl')
     # args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'gpu' else "cpu")
+    
+
     args.output_path = join(args.output_path, args.train_mode, 'bsz-{}-lr-{}-dropout-{}'.format(args.batch_size_train, args.lr, args.dropout))
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
