@@ -126,7 +126,7 @@ def load_train_data_unsupervised(tokenizer, args):
     with open(args.train_file, 'r', encoding='utf8') as f:
         lines = f.readlines()
         # print(lines)
-        lines = lines[:6400]
+#         lines = lines[:6400]
         print("len of train data:{}".format(len(lines)))
         idx = 0
         for line in tqdm(lines):
