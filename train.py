@@ -68,6 +68,7 @@ def train(model, train_loader, dev_loader, optimizer, args):
                 loss = simcse_sup_loss(out, device)
 
             optimizer.zero_grad()
+            print('simcse_loss%.05f\t cls_loss%0.5f\5'%(loss.item(), loss_cls.item()))
             loss = loss + alpha * loss_cls
             loss.backward()
             optimizer.step()
@@ -125,7 +126,7 @@ def load_train_data_unsupervised(tokenizer, args):
     with open(args.train_file, 'r', encoding='utf8') as f:
         lines = f.readlines()
         # print(lines)
-        # lines = lines[:100]
+        lines = lines[:100]
         print("len of train data:{}".format(len(lines)))
         idx = 0
         for line in tqdm(lines):
@@ -269,7 +270,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     seed_everything(args.seed)
-    args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'cuda' else "cpu")
+    args.device = torch.device("cuda:0" if torch.cuda.is_available() and args.device == 'gpu' else "cpu")
     args.output_path = join(args.output_path, args.train_mode, 'bsz-{}-lr-{}-dropout-{}'.format(args.batch_size_train, args.lr, args.dropout))
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
