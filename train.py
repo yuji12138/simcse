@@ -61,12 +61,12 @@ def train(model, train_loader, dev_loader, optimizer, args):
             token_type_ids = data['token_type_ids'].view(-1, sql_len).to(device)
             idx = data['idx'].view(2*args.batch_size_train).to(device)
             out = model(input_ids, attention_mask, token_type_ids)
-            # cls_pred = model(input_ids, attention_mask, token_type_ids)
+            cls_pred = model(input_ids, attention_mask, token_type_ids)
             if args.train_mode == 'unsupervise':
                 loss = simcse_unsup_loss(out, device)
                 ## classifiy loss
 
-                loss_cls = criterion(out,idx)
+                loss_cls = criterion(cls_pred,idx)
             else:
                 loss = simcse_sup_loss(out, device)
 
@@ -217,9 +217,8 @@ def main(args):
         'pooler should in ["cls", "pooler", "last-avg", "first-last-avg"]'
     model = SimcseModel(pretrained_model=args.pretrain_model_path, pooling=args.pooler, dropout=args.dropout).to(
         args.device)
-    device = torch.device("cuda", local_rank)
-    model = nn.Linear(10, 10).to(device)
-    model = DDP(model, device_ids=[local_rank], output_device=local_rank)
+    model.to(args.device)
+    model = DDP(model, device_ids=[args.local_rank], output_device=args.local_rank)
     if args.do_train:
         # 加载数据集
         assert args.train_mode in ['supervise', 'unsupervise'], \
