@@ -1,6 +1,6 @@
 import argparse
 from tqdm import tqdm
-# from loguru import logger
+from loguru import logger
 
 import numpy as np
 from scipy.stats import spearmanr
@@ -276,8 +276,8 @@ if __name__ == '__main__':
         os.makedirs(args.output_path)
 
     cur_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
-    # logger.add(join(args.output_path, 'train-{}.log'.format(cur_time)))
-    # logger.info(args)
+    logger.add(join(args.output_path, 'train-{}.log'.format(cur_time)))
+    logger.info(args)
     print(args)
     writer = SummaryWriter(args.output_path)
     main(args)
