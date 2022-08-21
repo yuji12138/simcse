@@ -3,7 +3,7 @@
     --output_path output \
     --lr 3e-5 \
     --dropout 0.1 \
-    --epochs 2 \
+    --epochs 1 \
     --batch_size_train 64 \
     --batch_size_eval 256 \
     --num_workers 0 \
